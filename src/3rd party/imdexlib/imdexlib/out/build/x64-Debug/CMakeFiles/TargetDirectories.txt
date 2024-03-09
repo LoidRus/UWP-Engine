@@ -1,0 +1,3 @@
+D:/UWP-Engine/src/3rd party/imdexlib/imdexlib/out/build/x64-Debug/CMakeFiles/imdexlib-src.dir
+D:/UWP-Engine/src/3rd party/imdexlib/imdexlib/out/build/x64-Debug/CMakeFiles/edit_cache.dir
+D:/UWP-Engine/src/3rd party/imdexlib/imdexlib/out/build/x64-Debug/CMakeFiles/rebuild_cache.dir
