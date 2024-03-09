@@ -269,6 +269,13 @@ public:
 	virtual void			OnHiddenItem();
 	virtual void			SendHiddenItem();	//same as OnHiddenItem but for client... (sends message to a server)...
 
+	// Новое
+	float m_fLR_ShootingFactor; // Фактор горизонтального сдвига худа при стрельбе [-1; +1] // SWM 3
+	float m_fUD_ShootingFactor; // Фактор вертикального сдвига худа при стрельбе [-1; +1]
+	float m_fBACKW_ShootingFactor; // Фактор сдвига худа в сторону лица при стрельбе [0; +1]
+
+	IC float GetZRotatingFactor() const { return m_zoom_params.m_fZoomRotationFactor; } // BaS
+
 public:
 	virtual bool			can_kill() const;
 	virtual CInventoryItem* can_kill(CInventory* inventory) const;
