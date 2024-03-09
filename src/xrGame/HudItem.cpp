@@ -282,9 +282,9 @@ void CHudItem::on_a_hud_attach()
 	}
 }
 
-u32 CHudItem::PlayHUDMotion(const shared_str& M, BOOL bMixIn, CHudItem*  W, u32 state, bool bWpn)
+u32 CHudItem::PlayHUDMotion(const shared_str& M, BOOL bMixIn, CHudItem* W, u32 state, float speed)
 {
-	u32 anim_time					= PlayHUDMotion_noCB(M, bMixIn, bWpn);
+	u32 anim_time = PlayHUDMotion_noCB(M, bMixIn, speed);
 	if (anim_time>0)
 	{
 		m_bStopAtEndAnimIsRunning	= true;
@@ -295,6 +295,22 @@ u32 CHudItem::PlayHUDMotion(const shared_str& M, BOOL bMixIn, CHudItem*  W, u32 
 	}else
 		m_bStopAtEndAnimIsRunning	= false;
 
+	return anim_time;
+}
+
+u32 CHudItem::PlayHUDMotionNew(const shared_str& M, const bool bMixIn, const u32 state, const bool randomAnim, float speed)
+{
+	u32 anim_time = PlayHUDMotion_noCB(M, bMixIn, speed);
+	if (anim_time > 0)
+	{
+		m_bStopAtEndAnimIsRunning = true;
+		m_dwMotionStartTm = Device.dwTimeGlobal;
+		m_dwMotionCurrTm = m_dwMotionStartTm;
+		m_dwMotionEndTm = m_dwMotionStartTm + anim_time;
+		m_startedMotionState = state;
+	}
+	else
+		m_bStopAtEndAnimIsRunning = false;
 	return anim_time;
 }
 
@@ -320,8 +336,23 @@ bool CHudItem::isHUDAnimationExist(LPCSTR anim_name)
 	return false;
 }
 
+u32 CHudItem::PlayHUDMotionIfExists(std::initializer_list<const char*> Ms, const bool bMixIn, const u32 state, const bool randomAnim, float speed)
+{
+	for (const auto* M : Ms)
+		if (isHUDAnimationExist(M))
+			return PlayHUDMotionNew(M, bMixIn, state, randomAnim, speed);
 
-u32 CHudItem::PlayHUDMotion_noCB(const shared_str& motion_name, BOOL bMixIn, bool bWpn)
+	std::string dbg_anim_name;
+	for (const auto* M : Ms)
+	{
+		dbg_anim_name += M;
+		dbg_anim_name += ", ";
+	}
+	Msg("~~[%s] Motions [%s] not found for [%s]", __FUNCTION__, dbg_anim_name.c_str(), HudSection().c_str());
+	return 0;
+}
+
+u32 CHudItem::PlayHUDMotion_noCB(const shared_str& motion_name, const bool bMixIn, const bool randomAnim, float speed)
 {
 	m_current_motion					= motion_name;
 
@@ -336,11 +367,12 @@ u32 CHudItem::PlayHUDMotion_noCB(const shared_str& motion_name, BOOL bMixIn, boo
 	}
 	if( HudItemData() )
 	{
-		return HudItemData()->anim_play		(motion_name, bMixIn, m_current_motion_def, m_started_rnd_anim_idx, bWpn);
-	}else
+		return HudItemData()->anim_play(motion_name, bMixIn, m_current_motion_def, m_started_rnd_anim_idx, speed);
+	}
+	else
 	{
 		m_started_rnd_anim_idx				= 0;
-		return g_player_hud->motion_length	(motion_name, HudSection(), m_current_motion_def );
+		return g_player_hud->motion_length(motion_name, HudSection(), m_current_motion_def);
 	}
 }
 
