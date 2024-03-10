@@ -1052,21 +1052,11 @@ void CActor::UpdateCL	()
 
 			// Обновляем двойной рендер от оружия [Update SecondVP with weapon data]
 			//pWeapon->UpdateSecondVP(); //--#SM+#-- +SecondVP+
-
-			bool bUseMark = !!pWeapon->bMarkCanShow();
-
-			//float fVPRotFactor = pWeapon->bNVsecondVPstatus ? pWeapon->GetZRotatingFactor() : 0.0f;
-
-			bool bNVEnbl  = !!pWeapon->bNVsecondVPstatus;
-
 			// Обновляем информацию об оружии в шейдерах
-			//g_pGamePersistent->m_pGShaderConstants->hud_params.x = pWeapon->GetZRotatingFactor(); //bInZoom;  //--#SM+#--
-			//g_pGamePersistent->m_pGShaderConstants->hud_params.y = pWeapon->GetSecondVPFov(); //--#SM+#--
-			//g_pGamePersistent->m_pGShaderConstants->hud_params.z = bUseMark; //--#SM+#--
-			//g_pGamePersistent->m_pGShaderConstants->hud_params.w = pWeapon->m_nearwall_last_hud_fov;; //--#SM+#--
-			//g_pGamePersistent->m_pGShaderConstants->m_blender_mode.x = bNVEnbl;  //--#SM+#--
+			//g_pGamePersistent->m_pGShaderConstants->hud_params.x = pWeapon->GetZRotatingFactor(); //--#SM+#--
+			//g_pGamePersistent->m_pGShaderConstants->hud_params.y = pWeapon->GetSecondVP_FovFactor(); //--#SM+#--
 
-						// Коллиматоры из BaS
+			// Коллиматоры из BaS
 			g_pGamePersistent->m_pGShaderConstants->hud_params.x = pWeapon->GetZRotatingFactor();
 			g_pGamePersistent->m_pGShaderConstants->hud_params.z = pWeapon->m_nearwall_last_hud_fov;
 		}
@@ -1076,16 +1066,17 @@ void CActor::UpdateCL	()
 	{
 		if(Level().CurrentEntity() && this->ID()==Level().CurrentEntity()->ID() )
 		{
-			HUD().DefineCrosshairCastingPoint(Cameras().Position(), Cameras().Direction());
 			HUD().SetCrosshairDisp(0.f);
 			HUD().ShowCrosshair(false);
 
-			// Очищаем информацию об оружии в шейдерах
-			g_pGamePersistent->m_pGShaderConstants->hud_params.set(0.f, 0.f, 0.f, 0.f); //--#SM+#--
-			g_pGamePersistent->m_pGShaderConstants->m_blender_mode.set(0.f, 0.f, 0.f, 0.f); //--#SM+#--
+			//
+			if (g_pGamePersistent && g_pGamePersistent->m_pGShaderConstants)
+			{
+				g_pGamePersistent->m_pGShaderConstants->hud_params.set(0.f, 0.f, 0.f, 0.f); //--#SM+#--
+				g_pGamePersistent->m_pGShaderConstants->m_blender_mode.set(0.f, 0.f, 0.f, 0.f); //--#SM+#--
+			}
 
-
-			// Отключаем второй вьюпорт [Turn off SecondVP]
+			//    [Turn off SecondVP]
 			//CWeapon::UpdateSecondVP();
 			Device.m_SecondViewport.SetSVPActive(false); //--#SM+#-- +SecondVP+
 		}
