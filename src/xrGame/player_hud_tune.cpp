@@ -251,29 +251,34 @@ void player_hud::tune(Ivector _values)
 		}
 		if ((values.x) || (values.y) || (values.z))
 		{
-			if (idx == 0)
-			{
-				Msg("[%s]", m_attached_items[hud_adj_item_idx]->m_sect_name.c_str());
-				Msg("hands_position%s				= %f,%f,%f", (is_16x9) ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
-				Msg("hands_orientation%s			= %f,%f,%f", (is_16x9) ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
-				Log("-----------");
-			}
-			else
-				if (idx == 1)
+				if (idx == 0)
+				{
+					Msg("[%s]", m_attached_items[hud_adj_item_idx]->m_sect_name.c_str());
+					Msg("hands_position%s				= %f,%f,%f", (is_16x9) ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
+					Msg("hands_orientation%s			= %f,%f,%f", (is_16x9) ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
+					Log("-----------");
+				}
+				else if (idx == 1)
 				{
 					Msg("[%s]", m_attached_items[hud_adj_item_idx]->m_sect_name.c_str());
 					Msg("aim_hud_offset_pos%s				= %f,%f,%f", (is_16x9) ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
 					Msg("aim_hud_offset_rot%s				= %f,%f,%f", (is_16x9) ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
 					Log("-----------");
 				}
-				else
-					if (idx == 2)
-					{
-						Msg("[%s]", m_attached_items[hud_adj_item_idx]->m_sect_name.c_str());
-						Msg("gl_hud_offset_pos%s				= %f,%f,%f", (is_16x9) ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
-						Msg("gl_hud_offset_rot%s				= %f,%f,%f", (is_16x9) ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
-						Log("-----------");
-					}
+				else if (idx == 2)
+				{
+					Msg("[%s]", m_attached_items[hud_adj_item_idx]->m_sect_name.c_str());
+					Msg("gl_hud_offset_pos%s				= %f,%f,%f", (is_16x9) ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
+					Msg("gl_hud_offset_rot%s				= %f,%f,%f", (is_16x9) ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
+					Log("-----------");
+				}
+				else if (idx == 3)
+				{
+					Msg("[%s]", m_attached_items[hud_adj_item_idx]->m_sect_name.c_str());
+					Msg("aim_hud_offset_alt_pos%s			= %f,%f,%f", (is_16x9) ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
+					Msg("aim_hud_offset_alt_rot%s			= %f,%f,%f", (is_16x9) ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
+					Log("-----------");
+				}
 		}
 	}
 	else if (hud_adj_mode == 8 || hud_adj_mode == 9)
@@ -325,14 +330,23 @@ void player_hud::tune(Ivector _values)
 				hi->m_measures.m_hands_offset[0][1].y,
 				hi->m_measures.m_hands_offset[0][1].z)
 			.c_str());
-		pHudCfg->w_string(sect_name,
-			make_string("aim_hud_offset_rot%s", (is_16x9) ? "_16x9" : "").c_str(),
-			make_string("%f,%f,%f",
+		pHudCfg->w_string(sect_name, make_string("aim_hud_offset_rot%s", (is_16x9) ? "_16x9" : "").c_str(), make_string("%f,%f,%f",
 				hi->m_measures.m_hands_offset[1][1].x,
 				hi->m_measures.m_hands_offset[1][1].y,
 				hi->m_measures.m_hands_offset[1][1].z)
 			.c_str());
-
+		//Альт. прицеливание
+		pHudCfg->w_string(sect_name, "aim_alt_hud_offset_pos_16x9", make_string("%f,%f,%f",
+				hi->m_measures.m_hands_offset[0][1].x,
+				hi->m_measures.m_hands_offset[0][1].y,
+				hi->m_measures.m_hands_offset[0][1].z)
+			.c_str());
+		pHudCfg->w_string(sect_name, "aim_alt_hud_offset_rot_16x9", make_string("%f,%f,%f",
+				hi->m_measures.m_hands_offset[1][1].x,
+				hi->m_measures.m_hands_offset[1][1].y,
+				hi->m_measures.m_hands_offset[1][1].z)
+			.c_str());
+		//-------------------------------------------------
 		pHudCfg->w_string(sect_name,
 			make_string("hands_position%s", (is_16x9) ? "_16x9" : "").c_str(),
 			make_string(

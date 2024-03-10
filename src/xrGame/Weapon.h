@@ -76,7 +76,7 @@ public:
 
 
 	virtual	bool			bInZoomRightNow() const { return m_zoom_params.m_fZoomRotationFactor > 0.05; }
-	IC		bool			bIsSecondVPZoomPresent() const { return GetSecondVPZoomFactor() > 0.000f; }
+	IC		bool			bIsSecondVPZoomPresent() const { return (GetSecondVPZoomFactor() > 0.000f && !m_bAltZoomActive); }
 	bool					bLoadAltScopesParams(LPCSTR section);
 	bool					bReloadSectionScope(LPCSTR section);
 	virtual	bool            bMarkCanShow() { return IsZoomed(); }
@@ -110,7 +110,6 @@ public:
 	virtual void HUD_VisualBulletUpdate(bool force = false, int force_idx = -1);
 
 	virtual float	GetControlInertionFactor() const;
-	IC		float	GetZRotatingFactor()    const { return m_zoom_params.m_fZoomRotationFactor; }
 	float			GetSecondVPZoomFactor() const;
 	float			GetHudFov();
 	float			GetSecondVPFov() const;
@@ -366,6 +365,11 @@ public:
 
 	u8		GetAddonsState()		const { return m_flagsAddOnState; };
 	void	SetAddonsState(u8 st) { m_flagsAddOnState = st; }//dont use!!! for buy menu only!!!
+
+	bool	IsAltAimEnabled() const { return m_bAltZoomEnabled; }
+	bool	GetAltZoomStatus() const { return m_bAltZoomActive; }
+	bool	SetAltZoomStatus(bool status) { m_bAltZoomActive = status; }
+	void	SwitchZoomMode();
 protected:
 	//состояние подключенных аддонов
 	u8 m_flagsAddOnState;
@@ -464,6 +468,9 @@ protected:
 	// 0-используется без участия рук, 1-одна рука, 2-две руки
 	EHandDependence			eHandDependence;
 	bool					m_bIsSingleHanded;
+
+	bool					m_bAltZoomEnabled;
+	bool					m_bAltZoomActive;
 
 public:
 	//загружаемые параметры

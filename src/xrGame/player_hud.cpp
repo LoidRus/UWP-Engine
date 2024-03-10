@@ -324,6 +324,11 @@ void hud_item_measures::load(const shared_str& sect_name, IKinematics* K)
 	strconcat					(sizeof(val_name),val_name,"gl_hud_offset_rot",_prefix);
 	m_hands_offset[1][2]		= pSettings->r_fvector3(sect_name, val_name);
 
+	strconcat(sizeof(val_name), val_name, "aim_alt_hud_offset_pos", _prefix);
+	m_hands_offset[0][3] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, m_hands_offset[0][1]);
+	strconcat(sizeof(val_name), val_name, "aim_alt_hud_offset_rot", _prefix);
+	m_hands_offset[1][3] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, m_hands_offset[1][1]);
+
 
 	R_ASSERT2(pSettings->line_exist(sect_name,"fire_point")==pSettings->line_exist(sect_name,"fire_bone"),		sect_name.c_str());
 	R_ASSERT2(pSettings->line_exist(sect_name,"fire_point2")==pSettings->line_exist(sect_name,"fire_bone2"),	sect_name.c_str());

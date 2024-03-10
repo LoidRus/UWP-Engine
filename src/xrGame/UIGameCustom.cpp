@@ -312,6 +312,45 @@ void StaticDrawableWrapper::Update()
 
 CMapListHelper gMapListHelper;
 
+SDrawStaticStruct::SDrawStaticStruct()
+{
+    m_static = NULL;
+    m_endTime = -1.0f;
+}
+
+void SDrawStaticStruct::destroy()
+{
+    delete_data(m_static);
+}
+
+bool SDrawStaticStruct::IsActual() const
+{
+    if (m_endTime < 0)			return true;
+    return (Device.fTimeGlobal < m_endTime);
+}
+
+void SDrawStaticStruct::SetText(LPCSTR text)
+{
+    m_static->Show(text != NULL);
+    if (text)
+    {
+        m_static->TextItemControl()->SetTextST(text);
+        m_static->ResetColorAnimation();
+    }
+}
+
+void SDrawStaticStruct::Draw()
+{
+    if (m_static->IsShown())
+        m_static->Draw();
+}
+
+void SDrawStaticStruct::Update()
+{
+    if (IsActual() && m_static->IsShown())
+        m_static->Update();
+}
+
 void CMapListHelper::LoadMapInfo(const char* cfgName, const xr_string& levelName, const char* levelVer /*= "1.0"*/)
 {
     CInifile levelCfg(cfgName);
