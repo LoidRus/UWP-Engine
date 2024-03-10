@@ -2740,6 +2740,11 @@ void CWeapon::UpdateAddonsVisual()
 	
 }
 
+void CWeapon::SwitchZoomMode()
+{
+	!m_bAltZoomActive ? m_bAltZoomActive = true : m_bAltZoomActive = false;
+}
+
 void CWeapon::UpdateAddonsTransform()
 {
 	for (auto& mesh : m_BAS_addons)
