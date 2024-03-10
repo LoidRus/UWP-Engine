@@ -117,6 +117,12 @@ const shared_str CWeapon::GetScopeName() const
 	}
 }
 
+void CWeapon::SwitchAltZoomMode()
+{
+
+	GetAltZoomStatus() ? SetAltZoomStatus(false) : SetAltZoomStatus(true);
+}
+
 void CWeapon::UpdateAltScope()
 {
 	if (m_eScopeStatus != ALife::eAddonAttachable || !bUseAltScope)
@@ -465,7 +471,7 @@ void CWeapon::Load(LPCSTR section)
 	misfireEndProbability = pSettings->r_float(section, "misfire_end_prob");
 	conditionDecreasePerShot = pSettings->r_float(section, "condition_shot_dec");
 	conditionDecreasePerQueueShot = READ_IF_EXISTS(pSettings, r_float, section, "condition_queue_shot_dec", conditionDecreasePerShot);
-
+	m_bAltZoomEnabled = READ_IF_EXISTS(pSettings, r_bool, section, "alt_scope", false);
 
 
 
@@ -529,6 +535,8 @@ void CWeapon::Load(LPCSTR section)
 		m_bAutoSpawnAmmo = pSettings->r_bool(section, "auto_spawn_ammo");
 	else
 		m_bAutoSpawnAmmo = TRUE;
+
+
 
 	m_zoom_params.m_bHideCrosshairInZoom = true;
 
@@ -1187,7 +1195,7 @@ void CWeapon::renderable_Render()
 	RenderLight();
 
 	//если мы в режиме снайперки, то сам HUD рисовать не надо
-	if (IsZoomed() && !IsRotatingToZoom() && ZoomTexture())
+	if ((IsZoomed() && !IsRotatingToZoom() && ZoomTexture()) && !GetAltZoomStatus())
 		RenderHud(FALSE);
 	else
 		RenderHud(TRUE);
@@ -1256,6 +1264,7 @@ bool CWeapon::Action(u16 cmd, u32 flags)
 	}
 
 	case kWPN_ZOOM:
+
 		if (IsZoomEnabled())
 		{
 			if (b_toggle_weapon_aim)
@@ -1705,7 +1714,7 @@ float CWeapon::CurrentZoomFactor()
 	}
 	else
 	{
-		return IsScopeAttached() ? m_zoom_params.m_fScopeZoomFactor : m_zoom_params.m_fIronSightZoomFactor;
+		return (IsScopeAttached() && !GetAltZoomStatus()) ? m_zoom_params.m_fScopeZoomFactor : m_zoom_params.m_fIronSightZoomFactor;
 	}
 };
 
@@ -1832,7 +1841,7 @@ void CWeapon::OnZoomOut()
 
 CUIWindow* CWeapon::ZoomTexture()
 {
-	if (UseScopeTexture() && (!psActorFlags.test(AF_3DSCOPE_ENABLE) || !bIsSecondVPZoomPresent()))
+	if (UseScopeTexture() && (!psActorFlags.test(AF_3DSCOPE_ENABLE) || !bIsSecondVPZoomPresent()) && !GetAltZoomStatus())
 		return m_UIScope;
 	else
 		return NULL;
@@ -2418,6 +2427,7 @@ bool CWeapon::render_item_ui_query()
 
 void CWeapon::render_item_ui()
 {
+
 	if (m_zoom_params.m_pVision)
 		m_zoom_params.m_pVision->Draw();
 
@@ -2554,9 +2564,14 @@ u8 CWeapon::GetCurrentHudOffsetIdx()
 		(!IsZoomed() && m_zoom_params.m_fZoomRotationFactor > 0.f));
 
 	if (!b_aiming)
-		return	0;
+		return		0;
 	else
-		return	1;
+	{
+		if (GetAltZoomStatus())
+			return 3;
+		else
+			return 1;
+	}
 }
 
 void CWeapon::render_hud_mode()
@@ -2738,11 +2753,6 @@ void CWeapon::UpdateAddonsSlotTransform()
 void CWeapon::UpdateAddonsVisual()
 {
 	
-}
-
-void CWeapon::SwitchZoomMode()
-{
-	!m_bAltZoomActive ? m_bAltZoomActive = true : m_bAltZoomActive = false;
 }
 
 void CWeapon::UpdateAddonsTransform()

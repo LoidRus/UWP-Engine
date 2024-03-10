@@ -33,6 +33,7 @@
 #include "clsid_game.h"
 #include "hudmanager.h"
 #include "Weapon.h"
+#include "UIGameCustom.h"
 
 extern u32 hud_adj_mode;
 extern u32 hud_adj_item_idx;
@@ -103,126 +104,121 @@ void CActor::IR_OnKeyboardPress(int cmd)
 #endif //DEBUG
 	switch (cmd)
 	{
-	case kJUMP:
-	{
-		mstate_wishful |= mcJump;
-	}break;
-	case kSPRINT_TOGGLE:
-	{
-		mstate_wishful ^= mcSprint;
-	}break;
-	case kCROUCH:
-	{
-		if (psActorFlags.test(AF_CROUCH_TOGGLE))
-			mstate_wishful ^= mcCrouch;
-	}break;
-	case kCAM_1:	cam_Set(eacFirstEye);				break;
-	case kCAM_2:	cam_Set(eacLookAt);				break;
-	case kCAM_3:	cam_Set(eacFreeLook);				break;
-	case kNIGHT_VISION:
-	{
-		SwitchNightVision();
-		break;
-	}
-	case kTORCH:
-	{
-		SwitchTorch();
-		break;
-	}
-
-	case kDETECTOR:
-	{
-		PIItem det_active = inventory().ItemFromSlot(DETECTOR_SLOT);
-		if (det_active)
+		case kJUMP:
 		{
-			CCustomDetector* det = smart_cast<CCustomDetector*>(det_active);
-			det->ToggleDetector(g_player_hud->attached_item(0) != NULL);
-			return;
+			mstate_wishful |= mcJump;
+		}break;
+		case kSPRINT_TOGGLE:
+		{
+			mstate_wishful ^= mcSprint;
+		}break;
+		case kCROUCH:
+		{
+			if (psActorFlags.test(AF_CROUCH_TOGGLE))
+				mstate_wishful ^= mcCrouch;
+		}break;
+		case kCAM_1:	cam_Set(eacFirstEye);				break;
+		case kCAM_2:	cam_Set(eacLookAt);				break;
+		case kCAM_3:	cam_Set(eacFreeLook);				break;
+		case kNIGHT_VISION:
+		{
+			SwitchNightVision();
+			break;
 		}
-	}break;
-	/*
-		case kFLARE:{
-				PIItem fl_active = inventory().ItemFromSlot(FLARE_SLOT);
-				if(fl_active)
-				{
-					CFlare* fl			= smart_cast<CFlare*>(fl_active);
-					fl->DropFlare		();
-					return				;
-				}
-
-				PIItem fli = inventory().Get(CLSID_DEVICE_FLARE, true);
-				if(!fli)			return;
-
-				CFlare* fl			= smart_cast<CFlare*>(fli);
-
-				if(inventory().Slot(fl))
-					fl->ActivateFlare	();
-			}break;
-	*/
-	case kUSE:
-		ActorUse();
-		break;
-	case kDROP:
-		b_DropActivated = TRUE;
-		f_DropPower = 0;
-		break;
-	case kNEXT_SLOT:
-	{
-		OnNextWeaponSlot();
-	}break;
-	case kPREV_SLOT:
-	{
-		OnPrevWeaponSlot();
-	}break;
-
-	case kQUICK_USE_1:
-	case kQUICK_USE_2:
-	case kQUICK_USE_3:
-	case kQUICK_USE_4:
-	{
-		const shared_str& item_name = g_quick_use_slots[cmd - kQUICK_USE_1];
-		if (item_name.size())
+		case kTORCH:
 		{
-			PIItem itm = inventory().GetAny(item_name.c_str());
+			SwitchTorch();
+			break;
+		}
 
-			if (itm)
+		case kDETECTOR:
+		{
+			PIItem det_active = inventory().ItemFromSlot(DETECTOR_SLOT);
+			if (det_active)
 			{
-				if (IsGameTypeSingle())
-				{
-					inventory().Eat(itm);
-				}
-				else
-				{
-					inventory().ClientEat(itm);
-				}
-
-				StaticDrawableWrapper* _s = CurrentGameUI()->AddCustomStatic("item_used", true);
-				string1024					str;
-				strconcat(sizeof(str), str, *CStringTable().translate("st_item_used"), ": ", itm->NameItem());
-				_s->wnd()->TextItemControl()->SetText(str);
-
-				CurrentGameUI()->GetActorMenu().m_pQuickSlot->ReloadReferences(this);
-			}
-		}
-	}break;
-	case kWPN_ALT_AIM:
-	{
-		auto wpn = smart_cast<CWeapon*>(inventory().ActiveItem());
-
-		if (wpn && wpn->IsScopeAttached())
-		{
-			if (!wpn->IsAltAimEnabled())
+				CCustomDetector* det = smart_cast<CCustomDetector*>(det_active);
+				det->ToggleDetector(g_player_hud->attached_item(0) != NULL);
 				return;
+			}
+		}break;
+		/*
+			case kFLARE:{
+					PIItem fl_active = inventory().ItemFromSlot(FLARE_SLOT);
+					if(fl_active)
+					{
+						CFlare* fl			= smart_cast<CFlare*>(fl_active);
+						fl->DropFlare		();
+						return				;
+					}
 
-			wpn->SwitchZoomMode();
+					PIItem fli = inventory().Get(CLSID_DEVICE_FLARE, true);
+					if(!fli)			return;
 
-			string256 alt_aim_status;
-			strconcat(sizeof(alt_aim_status), alt_aim_status, "st_alt_aim_switched_", wpn->GetAltZoomStatus() ? "on" : "off");
+					CFlare* fl			= smart_cast<CFlare*>(fli);
 
-			SDrawStaticStruct* custom_static = CurrentGameUI()->AddCustomStatic("alt_aim_switched", true);
-			custom_static->wnd()->TextItemControl()->SetText(CStringTable().translate(alt_aim_status).c_str());
-		}
-	}break;
+					if(inventory().Slot(fl))
+						fl->ActivateFlare	();
+				}break;
+		*/
+		case kUSE:
+			ActorUse();
+			break;
+		case kDROP:
+			b_DropActivated = TRUE;
+			f_DropPower = 0;
+			break;
+		case kNEXT_SLOT:
+		{
+			OnNextWeaponSlot();
+		}break;
+		case kPREV_SLOT:
+		{
+			OnPrevWeaponSlot();
+		}break;
+
+		case kQUICK_USE_1:
+		case kQUICK_USE_2:
+		case kQUICK_USE_3:
+		case kQUICK_USE_4:
+		{
+			const shared_str& item_name = g_quick_use_slots[cmd - kQUICK_USE_1];
+			if (item_name.size())
+			{
+				PIItem itm = inventory().GetAny(item_name.c_str());
+
+				if (itm)
+				{
+					if (IsGameTypeSingle())
+					{
+						inventory().Eat(itm);
+					}
+					else
+					{
+						inventory().ClientEat(itm);
+					}
+
+					StaticDrawableWrapper* _s = CurrentGameUI()->AddCustomStatic("item_used", true);
+					string1024					str;
+					strconcat(sizeof(str), str, *CStringTable().translate("st_item_used"), ": ", itm->NameItem());
+					_s->wnd()->TextItemControl()->SetText(str);
+
+					CurrentGameUI()->GetActorMenu().m_pQuickSlot->ReloadReferences(this);
+				}
+			}
+		}break;
+
+		case kWPN_ALT_AIM:
+		{
+			auto wpn = smart_cast<CWeapon*>(inventory().ActiveItem());
+
+			if (wpn)
+			{
+				if (!wpn->IsAltAimEnabled())
+					return;
+
+				wpn->SwitchAltZoomMode();
+			}
+		}break;
 	}
 }
 

@@ -368,8 +368,8 @@ public:
 
 	bool	IsAltAimEnabled() const { return m_bAltZoomEnabled; }
 	bool	GetAltZoomStatus() const { return m_bAltZoomActive; }
-	bool	SetAltZoomStatus(bool status) { m_bAltZoomActive = status; }
-	void	SwitchZoomMode();
+	void	SetAltZoomStatus(bool status) { m_bAltZoomActive = status; }
+	void	SwitchAltZoomMode();
 protected:
 	//состояние подключенных аддонов
 	u8 m_flagsAddOnState;

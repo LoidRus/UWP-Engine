@@ -808,7 +808,7 @@ u8 CWeaponMagazinedWGrenade::GetCurrentHudOffsetIdx()
 	{
 		if (m_bGrenadeMode)
 			return 2;
-		else if (m_bAltZoomActive)
+		else if (GetAltZoomStatus())
 			return 3;
 		else
 			return 1;
