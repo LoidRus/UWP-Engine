@@ -1,5 +1,5 @@
 #pragma once
-
+#include "StdAfx.h"
 #include "script_export_space.h"
 #include "object_interfaces.h"
 #include "inventory_space.h"
@@ -20,20 +20,6 @@ class CUIPdaWnd;
 struct KillMessageStruct;
 class CUIMainIngameWnd;
 class CUIMessagesWindow;
-
-struct SDrawStaticStruct :public IPureDestroyableObject
-{
-    SDrawStaticStruct();
-    virtual	void	destroy();
-    CUIStatic* m_static;
-    float			m_endTime;
-    shared_str		m_name;
-    void			Draw();
-    void			Update();
-    CUIStatic* wnd() { return m_static; }
-    bool			IsActual()	const;
-    void			SetText(LPCSTR);
-};
 
 struct StaticDrawableWrapper : public IPureDestroyableObject
 {
