@@ -1039,44 +1039,53 @@ void CActor::UpdateCL	()
 
 			HUD().DefineCrosshairCastingPoint(pos, dir);
 
-			BOOL B = ! ((mstate_real & mcLookout) && !IsGameTypeSingle());
+			BOOL B = !((mstate_real & mcLookout) && !IsGameTypeSingle());
 
-			psHUD_Flags.set( HUD_WEAPON_RT, B );
+			psHUD_Flags.set(HUD_WEAPON_RT, B);
 
 			B = B && pWeapon->show_crosshair();
 
-			psHUD_Flags.set( HUD_CROSSHAIR_RT2, B );
-			
-			
-			psHUD_Flags.set( HUD_DRAW_RT,		pWeapon->show_indicators() );
+			psHUD_Flags.set(HUD_CROSSHAIR_RT2, B);
+
+
+			psHUD_Flags.set(HUD_DRAW_RT, pWeapon->show_indicators());
 
 			// Обновляем двойной рендер от оружия [Update SecondVP with weapon data]
 			//pWeapon->UpdateSecondVP(); //--#SM+#-- +SecondVP+
-			// Обновляем информацию об оружии в шейдерах
-			//g_pGamePersistent->m_pGShaderConstants->hud_params.x = pWeapon->GetZRotatingFactor(); //--#SM+#--
-			//g_pGamePersistent->m_pGShaderConstants->hud_params.y = pWeapon->GetSecondVP_FovFactor(); //--#SM+#--
+
+			bool bUseMark = !!pWeapon->bMarkCanShow();
+
+			//float fVPRotFactor = pWeapon->bNVsecondVPstatus ? pWeapon->GetZRotatingFactor() : 0.0f;
+
+			bool bNVEnbl = !!pWeapon->bNVsecondVPstatus;
+
 
 			// Коллиматоры из BaS
 			g_pGamePersistent->m_pGShaderConstants->hud_params.x = pWeapon->GetZRotatingFactor();
 			g_pGamePersistent->m_pGShaderConstants->hud_params.z = pWeapon->m_nearwall_last_hud_fov;
+			// Обновляем информацию об оружии в шейдерах
+			//g_pGamePersistent->m_pGShaderConstants->hud_params.x = pWeapon->GetZRotatingFactor(); //bInZoom;  //--#SM+#--
+			//g_pGamePersistent->m_pGShaderConstants->hud_params.y = pWeapon->GetSecondVPFov(); //--#SM+#--
+			g_pGamePersistent->m_pGShaderConstants->hud_params.z = bUseMark; //--#SM+#--
+			g_pGamePersistent->m_pGShaderConstants->hud_params.w = pWeapon->m_nearwall_last_hud_fov;; //--#SM+#--
+			g_pGamePersistent->m_pGShaderConstants->m_blender_mode.x = bNVEnbl;  //--#SM+#--
 		}
 
 	}
 	else
 	{
-		if(Level().CurrentEntity() && this->ID()==Level().CurrentEntity()->ID() )
+		if (Level().CurrentEntity() && this->ID() == Level().CurrentEntity()->ID())
 		{
+			HUD().DefineCrosshairCastingPoint(Cameras().Position(), Cameras().Direction());
 			HUD().SetCrosshairDisp(0.f);
 			HUD().ShowCrosshair(false);
 
-			//
-			if (g_pGamePersistent && g_pGamePersistent->m_pGShaderConstants)
-			{
-				g_pGamePersistent->m_pGShaderConstants->hud_params.set(0.f, 0.f, 0.f, 0.f); //--#SM+#--
-				g_pGamePersistent->m_pGShaderConstants->m_blender_mode.set(0.f, 0.f, 0.f, 0.f); //--#SM+#--
-			}
+			// Очищаем информацию об оружии в шейдерах
+			g_pGamePersistent->m_pGShaderConstants->hud_params.set(0.f, 0.f, 0.f, 0.f); //--#SM+#--
+			g_pGamePersistent->m_pGShaderConstants->m_blender_mode.set(0.f, 0.f, 0.f, 0.f); //--#SM+#--
 
-			//    [Turn off SecondVP]
+
+			// Отключаем второй вьюпорт [Turn off SecondVP]
 			//CWeapon::UpdateSecondVP();
 			Device.m_SecondViewport.SetSVPActive(false); //--#SM+#-- +SecondVP+
 		}
